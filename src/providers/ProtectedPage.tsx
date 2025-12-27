@@ -16,12 +16,7 @@ const ProtectedPage = ({ children }: { children: React.ReactNode }) => {
   const api = useAxios();
   const [shouldRender, setShouldRender] = useState(false);
 
-  // Fetch latest developer profile
-  const {
-    data: developerData,
-    error,
-    isError,
-  } = useQuery({
+  const { data: developerData, isError } = useQuery({
     queryKey: ["developerProfile"],
     queryFn: async () => {
       if (!isAuthenticated) return null;

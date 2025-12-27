@@ -29,12 +29,6 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Plus } from "lucide-react";
 import { useCreatePlot } from "@/hooks/usePlot";
-import {
-  CreatePlotInput,
-  PlotAreaUnit,
-  Facing,
-  PlotType,
-} from "@/types/project.types";
 
 // Validation Schema
 const createPlotSchema = z.object({
@@ -76,6 +70,7 @@ const CreatePlotDialog = ({ projectId, trigger }: CreatePlotDialogProps) => {
   const createPlot = useCreatePlot();
 
   const form = useForm<CreatePlotFormValues>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(createPlotSchema) as any,
     defaultValues: {
       plotNumber: "",

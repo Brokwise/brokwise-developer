@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import useAxios, { ApiResponse } from "./useAxios";
+import useAxios, { ApiResponse, ApiError } from "./useAxios";
 import { toast } from "sonner";
 import {
   Project,
@@ -76,7 +76,7 @@ export const useCreateProject = () => {
       queryClient.invalidateQueries({ queryKey: PROJECT_QUERY_KEYS.all });
       toast.success("Project created successfully");
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to create project");
     },
   });
@@ -107,7 +107,7 @@ export const useUpdateProject = () => {
       });
       toast.success("Project updated successfully");
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to update project");
     },
   });
@@ -124,11 +124,11 @@ export const useActivateProject = () => {
       );
       return response.data.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PROJECT_QUERY_KEYS.all });
       toast.success("Project activated successfully");
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(
         error.response?.data?.message || "Failed to activate project"
       );
@@ -151,7 +151,7 @@ export const useDeleteProject = () => {
       queryClient.invalidateQueries({ queryKey: PROJECT_QUERY_KEYS.all });
       toast.success("Project deleted successfully");
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to delete project");
     },
   });
@@ -181,7 +181,7 @@ export const useUploadProjectImages = () => {
 
       return uploadedUrls;
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast.error("Failed to upload images");
       console.log("Upload error:", error);
     },
@@ -210,7 +210,7 @@ export const useUploadProjectDocuments = () => {
 
       return uploadedUrls;
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast.error("Failed to upload documents");
       console.error("Upload error:", error);
     },

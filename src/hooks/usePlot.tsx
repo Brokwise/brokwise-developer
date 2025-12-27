@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import useAxios, { ApiResponse } from "./useAxios";
+import useAxios, { ApiResponse, ApiError } from "./useAxios";
 import { toast } from "sonner";
 import {
   Plot,
@@ -87,7 +87,7 @@ export const useCreatePlot = () => {
       });
       toast.success("Plot created successfully");
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to create plot");
     },
   });
@@ -112,7 +112,7 @@ export const useBulkCreatePlots = () => {
       });
       toast.success(`${data.count} plots created successfully`);
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to create plots");
     },
   });
@@ -141,7 +141,7 @@ export const useUpdatePlot = () => {
       queryClient.setQueryData(PLOT_QUERY_KEYS.detail(data._id), data);
       toast.success("Plot updated successfully");
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to update plot");
     },
   });
@@ -170,7 +170,7 @@ export const useUpdatePlotStatus = () => {
       queryClient.setQueryData(PLOT_QUERY_KEYS.detail(data._id), data);
       toast.success("Plot status updated successfully");
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(
         error.response?.data?.message || "Failed to update plot status"
       );
@@ -202,7 +202,7 @@ export const useDeletePlot = () => {
       });
       toast.success("Plot deleted successfully");
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to delete plot");
     },
   });
@@ -227,7 +227,7 @@ export const useBulkUpdatePlots = () => {
       });
       toast.success(`${data.modified} plots updated successfully`);
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast.error(error.response?.data?.message || "Failed to update plots");
     },
   });

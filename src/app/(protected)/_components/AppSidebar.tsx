@@ -9,19 +9,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import {
-  HomeIcon,
-  LayoutDashboard,
-  Users,
-  LogOut,
-  Building2,
-  SunMoon,
-  MessageCircle,
-  File,
-  Briefcase,
-  MessageCircleMore,
-  LandPlot,
-} from "lucide-react";
+import { LayoutDashboard, LogOut, SunMoon, LandPlot } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { useAuthStore } from "@/stores/authStore";

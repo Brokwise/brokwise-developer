@@ -43,14 +43,7 @@ import {
   useDeletePlot,
 } from "@/hooks/usePlot";
 import { toast } from "sonner";
-import {
-  Grip,
-  Loader2,
-  Map as MapIcon,
-  MousePointer2,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Grip, Loader2, Map as MapIcon, Plus, Trash2 } from "lucide-react";
 
 type PlotNodeData = {
   plotNumber: string;
@@ -145,7 +138,7 @@ const PlotCanvasInner = ({
   onRefresh,
 }: PlotCanvasProps) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges] = useEdgesState([]);
+  const [edges] = useEdgesState([]);
   const [selectedNodeIds, setSelectedNodeIds] = useState<string[]>([]);
   const [dirtyNodeIds, setDirtyNodeIds] = useState<Set<string>>(new Set());
 
@@ -244,7 +237,7 @@ const PlotCanvasInner = ({
     )
       return;
 
-    const jobs: Promise<any>[] = [];
+    const jobs: Promise<unknown>[] = [];
     removable.forEach((node) => {
       if (node.data.isNew) {
         setNodes((nds) => nds.filter((n) => n.id !== node.id));
@@ -280,7 +273,7 @@ const PlotCanvasInner = ({
   }, [selectedNodeIds, nodes, setNodes]);
 
   const handleSave = async () => {
-    const jobs: Promise<any>[] = [];
+    const jobs: Promise<unknown>[] = [];
 
     if (pendingCreates.length) {
       jobs.push(

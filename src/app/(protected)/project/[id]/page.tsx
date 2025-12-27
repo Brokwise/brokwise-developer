@@ -58,7 +58,6 @@ import {
 } from "@/components/ui/dialog";
 import {
   ArrowLeft,
-  Building2,
   Calendar,
   FileText,
   LandPlot,
@@ -69,7 +68,7 @@ import {
 import { format } from "date-fns";
 import Link from "next/link";
 import CreatePlotDialog from "@/components/plots/CreatePlotDialog";
-import PlotCanvas from "@/components/plots/CreatePlotDialog";
+// import PlotCanvas from "@/components/plots/CreatePlotDialog";
 import { Separator } from "@/components/ui/separator";
 
 type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
@@ -170,7 +169,7 @@ const ProjectPage = () => {
       });
       refetchPlots();
       refetchProject();
-    } catch (error) {
+    } catch {
       // Error is handled by the mutation hook
     }
   };
@@ -179,7 +178,7 @@ const ProjectPage = () => {
     try {
       await activateProject.mutateAsync(id);
       refetchProject();
-    } catch (error) {
+    } catch {
       // Error is handled by the mutation hook
     }
   };

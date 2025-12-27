@@ -49,6 +49,7 @@ const CreateProjectDialog = ({ children }: CreateProjectDialogProps) => {
   // Explicitly typing the form with CreateProjectFormValues and removing the strict resolver type check
   // or simply letting TypeScript infer where possible to avoid conflict between optional fields
   const form = useForm<CreateProjectFormValues>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(createProjectSchema) as any,
     defaultValues: {
       name: "",

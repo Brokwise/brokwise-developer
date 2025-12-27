@@ -16,14 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Building2,
-  Plus,
-  Search,
-  MapPin,
-  Calendar,
-  FileText,
-} from "lucide-react";
+import { Building2, Search, MapPin, Calendar, FileText } from "lucide-react";
 import { format } from "date-fns";
 import CreateProjectDialog from "@/components/projects/CreateProjectDialog";
 import { useRouter } from "next/navigation";
