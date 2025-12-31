@@ -465,16 +465,6 @@ const ProjectPage = () => {
           <CreatePlotDialog projectId={id} />
         </div>
 
-        {/* <PlotCanvas
-          projectId={id}
-          plots={plotsData?.plots ?? []}
-          isLoading={isPlotsLoading}
-          onRefresh={() => {
-            refetchPlots();
-            refetchProject();
-          }}
-        /> */}
-
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4 bg-muted/50 p-4 rounded-lg border">
           <div className="w-full sm:w-[200px]">
