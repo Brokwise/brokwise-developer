@@ -9,7 +9,13 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, LogOut, SunMoon, LandPlot } from "lucide-react";
+import {
+  LayoutDashboard,
+  LogOut,
+  SunMoon,
+  LandPlot,
+  BookCheck,
+} from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { useAuthStore } from "@/stores/authStore";
@@ -46,6 +52,14 @@ const AppSidebar = () => {
               <Link href="/">
                 <LandPlot />
                 <span>Projects</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip="JDA Forms">
+              <Link href="/bookings">
+                <BookCheck />
+                <span>Bookings</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

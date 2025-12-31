@@ -31,6 +31,7 @@ export const createProjectSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   approvalDocuments: z.array(z.string().url()).optional().default([]),
   images: z.array(z.string().url()).optional().default([]),
+  sitePlan: z.string().url().optional(),
   amenities: z.array(z.string()).optional().default([]),
   developmentStatus: z.enum([
     "ready-to-develop",
@@ -84,6 +85,7 @@ export const updateProjectSchema = z.object({
   description: z.string().min(10).optional(),
   approvalDocuments: z.array(z.string().url()).optional(),
   images: z.array(z.string().url()).optional(),
+  sitePlan: z.string().url().optional(),
   amenities: z.array(z.string()).optional(),
   developmentStatus: z
     .enum([

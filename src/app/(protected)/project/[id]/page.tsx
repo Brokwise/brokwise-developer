@@ -68,8 +68,10 @@ import {
 import { format } from "date-fns";
 import Link from "next/link";
 import CreatePlotDialog from "@/components/plots/CreatePlotDialog";
+import CreateBlockDialog from "@/components/blocks/CreateBlockDialog";
 // import PlotCanvas from "@/components/plots/CreatePlotDialog";
 import { Separator } from "@/components/ui/separator";
+import { useBlocksByProject, useDeleteBlock } from "@/hooks/useBlock";
 
 type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
 
@@ -96,6 +98,7 @@ const ProjectPage = () => {
     status: undefined as PlotStatus | undefined,
     minPrice: undefined as number | undefined,
     maxPrice: undefined as number | undefined,
+    blockId: undefined as string | undefined,
   });
   const [statusUpdateDialog, setStatusUpdateDialog] = useState<{
     isOpen: boolean;
@@ -123,12 +126,29 @@ const ProjectPage = () => {
     isLoading: isPlotsLoading,
     refetch: refetchPlots,
   } = usePlotsByProject(id, plotFilters);
+  const { data: blocks, isLoading: isBlocksLoading } = useBlocksByProject(id);
   const deletePlot = useDeletePlot();
+  const deleteBlock = useDeleteBlock();
   const updatePlotStatus = useUpdatePlotStatus();
 
   const handleDeletePlot = async (plotId: string) => {
     if (confirm("Are you sure you want to delete this plot?")) {
       await deletePlot.mutateAsync({ plotId, projectId: id });
+    }
+  };
+
+  const handleDeleteBlock = async (blockId: string) => {
+    if (
+      confirm(
+        "Are you sure you want to delete this block? This will fail if the block has plots."
+      )
+    ) {
+      try {
+        await deleteBlock.mutateAsync({ blockId, projectId: id });
+      } catch (error) {
+        console.error("Failed to delete block:", error);
+        alert("Failed to delete block. Ensure it has no plots.");
+      }
     }
   };
 
@@ -336,6 +356,104 @@ const ProjectPage = () => {
             <div className="h-3 w-3 rounded-full bg-yellow-500" />
           </CardContent>
         </Card>
+      </div>
+
+      <Separator />
+
+      {/* Block Management */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h2 className="text-xl font-semibold">Blocks / Phases</h2>
+          <CreateBlockDialog projectId={id} />
+        </div>
+
+        {isBlocksLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-32 w-full" />
+            ))}
+          </div>
+        ) : blocks?.length === 0 ? (
+          <div className="text-center py-10 bg-muted/20 rounded-lg border border-dashed">
+            <p className="text-muted-foreground mb-4">
+              No blocks found. Create a block to start adding plots.
+            </p>
+            <CreateBlockDialog projectId={id} />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <Card
+              className={`cursor-pointer transition-all hover:border-primary ${
+                !plotFilters.blockId
+                  ? "border-primary ring-2 ring-primary/20"
+                  : ""
+              }`}
+              onClick={() =>
+                setPlotFilters((prev) => ({
+                  ...prev,
+                  blockId: undefined,
+                  page: 1,
+                }))
+              }
+            >
+              <CardContent className="p-6 flex flex-col items-center justify-center h-full min-h-[120px]">
+                <h3 className="text-lg font-semibold mb-1">All Blocks</h3>
+                <p className="text-sm text-muted-foreground">View all plots</p>
+              </CardContent>
+            </Card>
+
+            {blocks?.map((block) => (
+              <Card
+                key={block._id}
+                className={`group relative cursor-pointer transition-all hover:border-primary ${
+                  plotFilters.blockId === block._id
+                    ? "border-primary ring-2 ring-primary/20"
+                    : ""
+                }`}
+                onClick={() =>
+                  setPlotFilters((prev) => ({
+                    ...prev,
+                    blockId: block._id,
+                    page: 1,
+                  }))
+                }
+              >
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteBlock(block._id);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-semibold truncate pr-6">
+                      {block.name}
+                    </h3>
+                  </div>
+                  {block.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                      {block.description}
+                    </p>
+                  )}
+                  <Badge
+                    variant={
+                      block.status === "active" ? "default" : "secondary"
+                    }
+                  >
+                    {block.status}
+                  </Badge>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       <Separator />

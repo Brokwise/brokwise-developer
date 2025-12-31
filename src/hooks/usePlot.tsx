@@ -41,6 +41,7 @@ export const usePlotsByProject = (
         searchParams.set("minPrice", params.minPrice.toString());
       if (params.maxPrice)
         searchParams.set("maxPrice", params.maxPrice.toString());
+      if (params.blockId) searchParams.set("blockId", params.blockId);
 
       const queryString = searchParams.toString();
       const url = `/projects/${projectId}/plots${

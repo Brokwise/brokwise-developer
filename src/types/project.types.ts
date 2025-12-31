@@ -52,6 +52,7 @@ export interface Project {
   description: string;
   approvalDocuments: string[];
   images: string[];
+  sitePlan?: string;
   amenities: string[];
   developmentStatus: DevelopmentStatus;
   projectStatus: ProjectStatus;
@@ -75,6 +76,7 @@ export interface CreateProjectInput {
   description: string;
   approvalDocuments?: string[];
   images?: string[];
+  sitePlan?: string;
   amenities?: string[];
   developmentStatus: DevelopmentStatus;
   totalArea?: number;
@@ -93,6 +95,7 @@ export interface UpdateProjectInput {
   description?: string;
   approvalDocuments?: string[];
   images?: string[];
+  sitePlan?: string;
   amenities?: string[];
   developmentStatus?: DevelopmentStatus;
   totalArea?: number;
@@ -129,6 +132,32 @@ export interface PlotStats {
 export interface ProjectWithStats {
   project: Project;
   plotStats: PlotStats;
+}
+
+// Block Types
+export type BlockStatus = "active" | "inactive" | "completed";
+
+export interface Block {
+  _id: string;
+  projectId: string;
+  name: string;
+  description?: string;
+  status: BlockStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBlockInput {
+  projectId: string;
+  name: string;
+  description?: string;
+  status?: BlockStatus;
+}
+
+export interface UpdateBlockInput {
+  name?: string;
+  description?: string;
+  status?: BlockStatus;
 }
 
 // Plot Types
@@ -169,6 +198,7 @@ export interface Boundaries {
 export interface Plot {
   _id: string;
   projectId: string;
+  blockId: string; // Added blockId
   plotNumber: string;
   area: number;
   areaUnit: PlotAreaUnit;
@@ -190,6 +220,7 @@ export interface Plot {
 
 export interface CreatePlotInput {
   projectId: string;
+  blockId: string; // Added blockId
   plotNumber: string;
   area: number;
   areaUnit: PlotAreaUnit;
@@ -205,6 +236,7 @@ export interface CreatePlotInput {
 }
 
 export interface UpdatePlotInput {
+  blockId?: string; // Added blockId
   plotNumber?: string;
   area?: number;
   areaUnit?: PlotAreaUnit;
@@ -239,6 +271,7 @@ export interface GetPlotsByProjectParams {
   status?: PlotStatus;
   minPrice?: number;
   maxPrice?: number;
+  blockId?: string; // Added blockId
 }
 
 export interface PlotsResponse {

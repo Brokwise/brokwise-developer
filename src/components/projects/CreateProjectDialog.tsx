@@ -28,13 +28,18 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, FileText } from "lucide-react";
 import {
   createProjectSchema,
   CreateProjectFormValues,
 } from "@/schema/project.schema";
-import { useCreateProject, useUploadProjectImages } from "@/hooks/useProject";
+import {
+  useCreateProject,
+  useUploadProjectImages,
+  useUploadProjectDocuments,
+} from "@/hooks/useProject";
 import { toast } from "sonner";
+import { LocationPicker } from "@/components/ui/location-picker";
 
 interface CreateProjectDialogProps {
   children?: React.ReactNode;
@@ -43,8 +48,10 @@ interface CreateProjectDialogProps {
 const CreateProjectDialog = ({ children }: CreateProjectDialogProps) => {
   const [open, setOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [selectedSitePlan, setSelectedSitePlan] = useState<File | null>(null);
   const createProject = useCreateProject();
   const uploadImages = useUploadProjectImages();
+  const uploadDocuments = useUploadProjectDocuments();
 
   // Explicitly typing the form with CreateProjectFormValues and removing the strict resolver type check
   // or simply letting TypeScript infer where possible to avoid conflict between optional fields
@@ -78,6 +85,7 @@ const CreateProjectDialog = ({ children }: CreateProjectDialogProps) => {
   const onSubmit = async (data: CreateProjectFormValues) => {
     try {
       let imageUrls: string[] = [];
+      let sitePlanUrl: string | undefined;
 
       if (selectedImages.length > 0) {
         toast.info("Uploading images...");
@@ -86,9 +94,20 @@ const CreateProjectDialog = ({ children }: CreateProjectDialogProps) => {
         });
       }
 
+      if (selectedSitePlan) {
+        toast.info("Uploading site plan...");
+        const uploadedDocs = await uploadDocuments.mutateAsync({
+          files: [selectedSitePlan],
+        });
+        if (uploadedDocs.length > 0) {
+          sitePlanUrl = uploadedDocs[0];
+        }
+      }
+
       await createProject.mutateAsync({
         ...data,
         images: imageUrls,
+        sitePlan: sitePlanUrl,
         // Ensure coordinates are numbers
         location: {
           type: "Point",
@@ -102,12 +121,41 @@ const CreateProjectDialog = ({ children }: CreateProjectDialogProps) => {
       setOpen(false);
       form.reset();
       setSelectedImages([]);
+      setSelectedSitePlan(null);
     } catch (error) {
       console.error("Failed to create project:", error);
     }
   };
 
-  const isSubmitting = createProject.isPending || uploadImages.isPending;
+  const isSubmitting =
+    createProject.isPending ||
+    uploadImages.isPending ||
+    uploadDocuments.isPending;
+
+  const handleLocationSelect = (details: {
+    coordinates: [number, number];
+    placeName: string;
+    pincode?: string;
+    context?: { id: string; text: string }[];
+  }) => {
+    // Update address fields
+    form.setValue("address.address", details.placeName);
+
+    // Extract city and state from context if available
+    if (details.context) {
+      const city = details.context.find((c) => c.id.startsWith("place"))?.text;
+      const state = details.context.find((c) =>
+        c.id.startsWith("region")
+      )?.text;
+
+      if (city) form.setValue("address.city", city);
+      if (state) form.setValue("address.state", state);
+    }
+
+    if (details.pincode) {
+      form.setValue("address.pincode", details.pincode);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -119,7 +167,7 @@ const CreateProjectDialog = ({ children }: CreateProjectDialogProps) => {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-3xl h-[90vh] overflow-scroll">
+      <DialogContent className="min-w-[90vw] h-[90vh] overflow-scroll">
         <DialogHeader>
           <DialogTitle>Create New Project</DialogTitle>
           <DialogDescription>
@@ -222,60 +270,94 @@ const CreateProjectDialog = ({ children }: CreateProjectDialogProps) => {
               </div>
 
               <div className="space-y-4">
-                <h3 className="font-medium">Location Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="address.address"
-                    render={({ field }) => (
-                      <FormItem className="col-span-2">
-                        <FormLabel>Full Address</FormLabel>
-                        <FormControl>
-                          <Input placeholder="123 Main St..." {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="address.city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City</FormLabel>
-                        <FormControl>
-                          <Input placeholder="City" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="address.state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>State</FormLabel>
-                        <FormControl>
-                          <Input placeholder="State" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="address.pincode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Pincode</FormLabel>
-                        <FormControl>
-                          <Input placeholder="123456" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Left Column: Address Fields */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Property Address</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="address.state"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>State</FormLabel>
+                            <FormControl>
+                              <Input placeholder="State" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="address.city"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>City</FormLabel>
+                            <FormControl>
+                              <Input placeholder="City" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="address.pincode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Pincode</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter 6-digit pincode"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="address.address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Address</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Enter complete property address"
+                              className="min-h-[100px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Right Column: Map */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Locate on Map</h3>
+                    <FormField
+                      control={form.control}
+                      name="location.coordinates"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <LocationPicker
+                              value={field.value as [number, number]}
+                              onChange={field.onChange}
+                              onLocationSelect={handleLocationSelect}
+                              className="h-full"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -345,6 +427,28 @@ const CreateProjectDialog = ({ children }: CreateProjectDialogProps) => {
                   </FormItem>
                 )}
               />
+
+              <div className="space-y-2">
+                <FormLabel>Project Site Plan (PDF)</FormLabel>
+                <div className="flex items-center gap-4">
+                  <Input
+                    type="file"
+                    accept=".pdf"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setSelectedSitePlan(e.target.files[0]);
+                      }
+                    }}
+                    className="cursor-pointer"
+                  />
+                  {selectedSitePlan && (
+                    <span className="text-sm text-muted-foreground flex items-center gap-2">
+                      <FileText size={16} />
+                      {selectedSitePlan.name}
+                    </span>
+                  )}
+                </div>
+              </div>
 
               <div className="space-y-2">
                 <FormLabel>Project Images</FormLabel>
