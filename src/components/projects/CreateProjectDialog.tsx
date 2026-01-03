@@ -65,6 +65,7 @@ const CreateProjectDialog = ({ children }: CreateProjectDialogProps) => {
       projectUse: "residential",
       legalStatus: "clear_title",
       developmentStatus: "ready-to-develop",
+      bookingTokenAmount: 0,
       description: "",
       address: {
         state: "",
@@ -403,6 +404,24 @@ const CreateProjectDialog = ({ children }: CreateProjectDialogProps) => {
                       <FormLabel>Possession Date</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="bookingTokenAmount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Booking Token Amount (₹)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Enter token amount"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

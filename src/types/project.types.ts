@@ -62,6 +62,7 @@ export interface Project {
   priceRange?: PriceRange;
   createdAt: string;
   updatedAt: string;
+  bookingTokenAmount: number;
 }
 
 export interface CreateProjectInput {
@@ -79,6 +80,7 @@ export interface CreateProjectInput {
   sitePlan?: string;
   amenities?: string[];
   developmentStatus: DevelopmentStatus;
+  bookingTokenAmount: number;
   totalArea?: number;
   totalAreaUnit?: AreaUnit;
   priceRange?: PriceRange;
@@ -98,6 +100,7 @@ export interface UpdateProjectInput {
   sitePlan?: string;
   amenities?: string[];
   developmentStatus?: DevelopmentStatus;
+  bookingTokenAmount?: number;
   totalArea?: number;
   totalAreaUnit?: AreaUnit;
   priceRange?: PriceRange;

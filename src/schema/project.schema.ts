@@ -39,6 +39,7 @@ export const createProjectSchema = z.object({
     "under-development",
     "phase-info",
   ]),
+  bookingTokenAmount: z.coerce.number().positive("Booking token amount must be positive"),
   totalArea: z.number().positive().optional(),
   totalAreaUnit: z
     .enum(["SQ_FT", "SQ_METER", "SQ_YARDS", "ACRES", "HECTARE", "BIGHA"])
@@ -95,6 +96,7 @@ export const updateProjectSchema = z.object({
       "phase-info",
     ])
     .optional(),
+  bookingTokenAmount: z.number().positive().optional(),
   totalArea: z.number().positive().optional(),
   totalAreaUnit: z
     .enum(["SQ_FT", "SQ_METER", "SQ_YARDS", "ACRES", "HECTARE", "BIGHA"])
